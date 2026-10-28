@@ -1,0 +1,33 @@
+/** @type {import('oxfmt').OxfmtConfig} */
+export default {
+  sortTailwindcss: {},
+  sortPackageJson: {
+    sortScripts: true,
+  },
+  semi: false,
+  singleQuote: true,
+  ignorePatterns: [
+    '**/.output',
+    '**/.data',
+    '**/.nuxt',
+    '**/.nitro',
+    '**/.cache',
+    '**/dist',
+    '**/node_modules',
+    '**/logs',
+    '**/*.log',
+    '**/.DS_Store',
+    '**/.fleet',
+    '**/.env',
+    '**/.env.*',
+    '!**/.env.example',
+    'test-results/',
+    'playwright/',
+    'playwright-report/',
+    'blob-report/',
+    'playwright/.cache/',
+    '!.dockerignore',
+    '!.prettierrc',
+    '**/public',
+  ],
+}
