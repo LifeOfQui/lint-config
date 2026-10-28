@@ -1,6 +1,6 @@
 {
   "name": "@lifeofqui/lint-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared ESLint, Oxlint and Oxfmt setup for Vue/Nuxt projects",
   "license": "MIT",
   "author": "Quirin Koch",
@@ -9,14 +9,22 @@
     "url": "git+https://github.com/LifeOfQui/lint-config.git"
   },
   "files": [
+    "eslint.d.ts",
     "eslint.js",
+    "oxfmt.d.ts",
     "oxfmt.js",
     "oxlintrc.json"
   ],
   "type": "module",
   "exports": {
-    "./eslint": "./eslint.js",
-    "./oxfmt": "./oxfmt.js",
+    "./eslint": {
+      "types": "./eslint.d.ts",
+      "default": "./eslint.js"
+    },
+    "./oxfmt": {
+      "types": "./oxfmt.d.ts",
+      "default": "./oxfmt.js"
+    },
     "./oxlintrc.json": "./oxlintrc.json",
     "./package.json": "./package.json"
   },
