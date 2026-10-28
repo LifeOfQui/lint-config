@@ -8,11 +8,19 @@ Das Paket bringt Regeln **und** Tool-Versionen mit: `eslint`, `oxlint` und `oxfm
 
 ## Setup in einem Projekt
 
+Zuerst die bisherigen Lint-Pakete deinstallieren, **dann** das Paket installieren (zwei getrennte Befehle):
+
+```bash
+npm uninstall eslint oxlint oxfmt eslint-plugin-oxlint eslint-plugin-vue @vue/eslint-config-typescript eslint-config-prettier @vue/eslint-config-prettier @nuxt/eslint
+```
+
 ```bash
 npm i -D @lifeofqui/lint-config
 ```
 
-`eslint`, `oxlint`, `oxfmt`, `eslint-plugin-oxlint`, `eslint-plugin-vue`, `@vue/eslint-config-typescript` und `eslint-config-prettier` aus den devDependencies des Projekts entfernen.
+Die Reihenfolge ist wichtig: Liegt beim Install noch eine andere Version von `oxfmt`, `oxlint` oder `eslint` im Projekt, legt npm die mitgelieferte Version verschachtelt unter `node_modules/@lifeofqui/lint-config/node_modules/` ab und das Binary fehlt in `node_modules/.bin`. Prüfen mit `ls node_modules/.bin | grep -E '^(eslint|oxlint|oxfmt)$'`. Falls doch passiert: `npm uninstall @lifeofqui/lint-config` und neu installieren. `npm dedupe` hilft hier nicht.
+
+Ist `@nuxt/eslint` auch in `modules` der `nuxt.config.ts` eingetragen, den Eintrag dort ebenfalls entfernen.
 
 **`.oxlintrc.json`**
 

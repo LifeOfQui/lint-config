@@ -25,6 +25,7 @@
     "import/no-duplicates": "error",
     "import/no-mutable-exports": "error",
     "import/no-named-default": "error",
+    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }],
     "unicorn/error-message": "error",
     "unicorn/escape-case": "error",
     "unicorn/no-abusive-eslint-disable": "error",
