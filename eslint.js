@@ -1,7 +1,10 @@
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import { includeIgnoreFile } from 'eslint/config'
 import skipFormatting from 'eslint-config-prettier'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const baseOxlintConfigFile = fileURLToPath(new URL('./oxlintrc.json', import.meta.url))
@@ -15,14 +18,29 @@ const defaultIgnores = ['**/.output', '**/.data', '**/.nuxt', '**/.nitro', '**/.
  * @param {object} [options]
  * @param {string[]} [options.ignores] Extra ignore globs, added to the Nuxt build output dirs.
  * @param {string} [options.oxlintConfigFile] Oxlint config whose rules ESLint turns off.
+ * @param {string | false} [options.gitignore] Ignore file whose patterns ESLint skips, relative to the
+ *   working directory. Skipped silently if missing; `false` turns it off.
  * @param {object[]} [options.configs] Project-specific flat configs, applied after the shared ones.
  */
 export function defineLintConfig({
   ignores = [],
   oxlintConfigFile = './.oxlintrc.json',
+  gitignore = '.gitignore',
   configs = [],
 } = {}) {
+  const gitignoreFile = gitignore === false ? null : resolve(gitignore)
+
   return [
+    // Lint the same files as Oxlint and Oxfmt, which both respect .gitignore
+    ...(gitignoreFile && existsSync(gitignoreFile)
+      ? [
+          includeIgnoreFile(gitignoreFile, {
+            gitignoreResolution: true,
+            name: 'lifeofqui/gitignore',
+          }),
+        ]
+      : []),
+
     ...defineConfigWithVueTs(
       { ignores: [...defaultIgnores, ...ignores] },
 

@@ -1,6 +1,6 @@
 {
   "name": "@lifeofqui/lint-config",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Shared ESLint, Oxlint and Oxfmt setup for Vue/Nuxt projects",
   "license": "MIT",
   "author": "Quirin Koch",

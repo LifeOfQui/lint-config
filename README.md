@@ -52,11 +52,12 @@ export default defineLintConfig()
 
 Optionen von `defineLintConfig`:
 
-| Option             | Default              | Zweck                                                                 |
-| ------------------ | -------------------- | --------------------------------------------------------------------- |
-| `ignores`          | `[]`                 | Zusätzliche Ignore-Globs (Nuxt-Build-Ordner sind schon drin)          |
-| `oxlintConfigFile` | `'./.oxlintrc.json'` | Oxlint-Config des Projekts, deren Regeln ESLint abschaltet            |
-| `configs`          | `[]`                 | Projektspezifische Flat-Configs, werden nach den geteilten angewendet |
+| Option             | Default              | Zweck                                                                                                                                                    |
+| ------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ignores`          | `[]`                 | Zusätzliche Ignore-Globs (Nuxt-Build-Ordner sind schon drin)                                                                                             |
+| `oxlintConfigFile` | `'./.oxlintrc.json'` | Oxlint-Config des Projekts, deren Regeln ESLint abschaltet                                                                                               |
+| `gitignore`        | `'.gitignore'`       | Ignore-Datei (relativ zum Arbeitsverzeichnis), deren Muster ESLint überspringt, wie Oxlint und Oxfmt. Fehlt sie, passiert nichts; `false` schaltet es ab |
+| `configs`          | `[]`                 | Projektspezifische Flat-Configs, werden nach den geteilten angewendet                                                                                    |
 
 **Scripts** (Standard, `npm-run-all` im Projekt)
 
@@ -76,7 +77,7 @@ Optionen von `defineLintConfig`:
 ## Projektspezifische Anpassungen
 
 - **Oxlint**: eigene `rules` / `overrides` in `.oxlintrc.json` nach dem `extends`. Spätere Einträge gewinnen.
-- **Oxfmt**: `export default { ...base, printWidth: 120 }`
+- **Oxfmt**: `export default { ...base, printWidth: 120 }`, zusätzliche Ignores mit `ignorePatterns: [...base.ignorePatterns, 'datei.json']`
 - **ESLint**: `defineLintConfig({ configs: [{ files: ['…'], rules: { … } }] })`
 
 ## Updates verteilen
@@ -87,6 +88,12 @@ Optionen von `defineLintConfig`:
 4. In den Projekten öffnet Dependabot einen PR (`.github/dependabot.yml`), die CI prüft ihn mit `npm run lint:check`.
 
 Semver: neue oder verschärfte Regeln und Tool-Updates mit Formatierungsänderungen → `minor`, Lockerungen und Fixes → `patch`, geänderte Datei-Struktur oder Optionen → `major`.
+
+## Stolperfalle: Inline-Handler mit mehreren Anweisungen
+
+Oxfmt entfernt mit `semi: false` das `;` aus Vue-Handlern wie `@click="a = 1; b = 2"` und schreibt die Anweisungen untereinander. Der Vue-Compiler erkennt mehrere Anweisungen aber nur am `;` und bricht dann den **Build** ab („Error parsing JavaScript expression“). Lint und Typecheck merken davon nichts.
+
+Deshalb keine Inline-Handler mit mehreren Anweisungen schreiben, sondern eine Funktion aufrufen (`@click="resetFilters"`). Nach einer Umstellung auf dieses Paket immer auch `npm run build` laufen lassen.
 
 ## Hinweis zu eslint-plugin-oxlint
 
