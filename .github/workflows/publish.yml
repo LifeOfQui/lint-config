@@ -1,25 +1,38 @@
 name: Publish
 
-# Runs for the tag `npm version` creates. Authenticates via npm Trusted Publishing (OIDC),
-# so no npm token is stored in the repo; provenance is attached automatically.
+# Runs for the tag `npm version` creates. Stages the release via npm Trusted Publishing (OIDC),
+# so no npm token is stored in the repo. It only goes live after approval with 2FA on npmjs.com.
 on:
   push:
     tags: ['v*']
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
       - name: Check tag matches package version
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
       - run: npm test
-      - run: npm publish
+
+  # Separate job: the smoke test runs install scripts of third-party packages, which must not
+  # get access to the OIDC token
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm stage publish
