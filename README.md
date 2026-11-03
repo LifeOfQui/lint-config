@@ -82,10 +82,14 @@ Optionen von `defineLintConfig`:
 
 ## Updates verteilen
 
-1. Regel oder Tool-Version hier ändern (Tool-Versionen immer exakt pinnen).
-2. Lokal testen: `npm pack`, im Projekt `npm i -D ../lint-config/lifeofqui-lint-config-<version>.tgz`, dann `npm run lint:check`.
-3. `npm version patch|minor|major` und danach `npm publish`.
-4. In den Projekten öffnet Dependabot einen PR (`.github/dependabot.yml`), die CI prüft ihn mit `npm run lint:check`.
+Tool-Updates kommen per Dependabot (`.github/dependabot.yml`): wöchentlich ein gesammelter PR für alle Minor- und Patch-Updates, Majors als eigene PRs. Regeländerungen werden direkt hier gemacht. Tool-Versionen immer exakt pinnen.
+
+1. Die CI prüft jeden PR mit `npm test` (`test/smoke.sh`). Das Skript packt das Paket, installiert es in eine Kopie von `test/fixture` und prüft, dass `eslint`, `oxlint` und `oxfmt` in `node_modules/.bin` liegen. Dann laufen alle drei Tools über das Fixture, und Oxlint und ESLint müssen je einen bekannten Verstoß melden.
+2. Bei größeren Änderungen zusätzlich in einem echten Projekt testen: `npm pack`, dort `npm i -D ../lint-config/lifeofqui-lint-config-<version>.tgz`, dann `npm run lint:check` und `npm run build`.
+3. Nach dem Merge lokal auf `main`: `npm version patch|minor|major` und `git push --follow-tags`. Der Tag startet `.github/workflows/publish.yml`, der nach `npm test` per npm Trusted Publishing veröffentlicht.
+4. In den Projekten öffnet Dependabot einen PR, die CI prüft ihn mit `npm run lint:check`.
+
+Einmalig auf npmjs.com einrichten: Paket → Settings → Trusted Publisher → GitHub Actions mit Owner `LifeOfQui`, Repository `lint-config` und Workflow `publish.yml`.
 
 Semver: neue oder verschärfte Regeln und Tool-Updates mit Formatierungsänderungen → `minor`, Lockerungen und Fixes → `patch`, geänderte Datei-Struktur oder Optionen → `major`.
 

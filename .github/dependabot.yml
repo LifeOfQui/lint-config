@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Keep the exact pins: for a published package the default strategy widens them to ranges
+    versioning-strategy: increase
+    groups:
+      # One PR for all minor/patch updates; majors come as separate PRs
+      tooling:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

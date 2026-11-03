@@ -1,0 +1,5 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/@lifeofqui/lint-config/oxlintrc.json"],
+  "ignorePatterns": ["public"]
+}

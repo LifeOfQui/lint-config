@@ -1,0 +1,5 @@
+{
+  "name": "lint-config-fixture",
+  "private": true,
+  "type": "module"
+}
