@@ -3,6 +3,7 @@ import { includeIgnoreFile } from 'eslint/config'
 import skipFormatting from 'eslint-config-prettier'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import pluginVue from 'eslint-plugin-vue'
+import pluginVueA11y from 'eslint-plugin-vuejs-accessibility'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -92,6 +93,38 @@ export function defineLintConfig({
           ],
           'vue/no-unused-refs': 'error',
           'vue/prefer-use-template-ref': 'error',
+        },
+      },
+
+      // Accessibility (curated): accessible names keep e2e locators role-based. Left out for noise in
+      // real projects: key-event rules (modal backdrops), no-onchange (deprecated), media-has-caption,
+      // no-autofocus, interactive-supports-focus (flags aria-activedescendant listboxes).
+      {
+        files: ['app/**/*.vue'],
+        plugins: { 'vuejs-accessibility': pluginVueA11y },
+        rules: {
+          'vuejs-accessibility/alt-text': 'error',
+          'vuejs-accessibility/anchor-has-content': 'error',
+          'vuejs-accessibility/aria-props': 'error',
+          'vuejs-accessibility/aria-role': 'error',
+          'vuejs-accessibility/aria-unsupported-elements': 'error',
+          'vuejs-accessibility/form-control-has-label': 'error',
+          'vuejs-accessibility/heading-has-content': 'error',
+          'vuejs-accessibility/iframe-has-title': 'error',
+          'vuejs-accessibility/label-has-for': [
+            'error',
+            {
+              // PrimeVue form controls
+              controlComponents: ['Checkbox', 'RadioButton', 'ToggleSwitch'],
+              required: { some: ['nesting', 'id'] },
+            },
+          ],
+          'vuejs-accessibility/no-access-key': 'error',
+          'vuejs-accessibility/no-aria-hidden-on-focusable': 'error',
+          'vuejs-accessibility/no-distracting-elements': 'error',
+          'vuejs-accessibility/no-role-presentation-on-focusable': 'error',
+          'vuejs-accessibility/role-has-required-aria-props': 'error',
+          'vuejs-accessibility/tabindex-no-positive': 'error',
         },
       },
 

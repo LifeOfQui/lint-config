@@ -1,6 +1,6 @@
 # @lifeofqui/lint-config
 
-Gemeinsames Lint- und Format-Setup für Vue-/Nuxt-Projekte: **Oxlint** für JS/TS, **ESLint** nur für das, was Oxlint nicht kann (Vue-Templates/SFCs, AST-Selector-Regeln), **Oxfmt** zum Formatieren.
+Gemeinsames Lint- und Format-Setup für Vue-/Nuxt-Projekte: **Oxlint** für JS/TS, **ESLint** nur für das, was Oxlint nicht kann (Vue-Templates/SFCs inkl. Barrierefreiheit, AST-Selector-Regeln), **Oxfmt** zum Formatieren.
 
 Das Paket bringt Regeln **und** Tool-Versionen mit: `eslint`, `oxlint` und `oxfmt` sind exakt gepinnte Dependencies. Ein Update dieses Pakets aktualisiert also Regeln und Tools in einem Schritt.
 
@@ -84,15 +84,26 @@ Optionen von `defineLintConfig`:
 
 Tool-Updates kommen per Dependabot (`.github/dependabot.yml`): wöchentlich ein gesammelter PR für alle Minor- und Patch-Updates, Majors als eigene PRs. Regeländerungen werden direkt hier gemacht. Tool-Versionen immer exakt pinnen.
 
-1. Die CI prüft jeden PR mit `npm test` (`test/smoke.sh`). Das Skript packt das Paket, installiert es in eine Kopie von `test/fixture` und prüft, dass `eslint`, `oxlint` und `oxfmt` in `node_modules/.bin` liegen. Dann laufen alle drei Tools über das Fixture, und Oxlint und ESLint müssen je einen bekannten Verstoß melden.
-2. Bei größeren Änderungen zusätzlich in einem echten Projekt testen: `npm pack`, dort `npm i -D ../lint-config/lifeofqui-lint-config-<version>.tgz`, dann `npm run lint:check` und `npm run build`.
-3. Nach dem Merge lokal auf `main`: `npm version patch|minor|major` und `git push --follow-tags`. Der Tag startet `.github/workflows/publish.yml`. Der Workflow lässt `npm test` laufen und legt die Version dann per npm Trusted Publishing als Staged Publish ab.
-4. Freigeben: auf npmjs.com im Tab „Staged Packages“ auf Approve klicken, oder `npm stage approve <stage-id>` (beides mit 2FA). Erst dann ist die Version live.
-5. In den Projekten öffnet Dependabot einen PR, die CI prüft ihn mit `npm run lint:check`.
+1. Die CI prüft jeden PR mit `npm test` (`test/smoke.sh`). Das Skript packt das Paket, installiert es in eine Kopie von `test/fixture` und prüft, dass `eslint`, `oxlint` und `oxfmt` in `node_modules/.bin` liegen. Dann laufen alle drei Tools über das Fixture, und Oxlint und ESLint müssen bekannte Verstöße melden.
+2. Lokal gegen echten Code testen: auf `main` (der Version, von der aus aktualisiert wird) `test/sync-projects.sh` ausführen. Das Skript kopiert aus jedem Nachbarprojekt, das dieses Paket nutzt (`../*`, `../*/*`), die größte Datei je Ordner (`app/pages`, `app/components`, `server`, `tests`, …) nach `test/fixture/**/_local/`. Dort werden die Dateien mit der aktuellen Version formatiert und gefixt. Was danach noch fehlschlägt, fliegt raus. Die Kopien sind gitignored, weil die Projekte privat sind. Dann auf den Update-Branch wechseln und `npm test` ausführen: Jeder Fehler kommt jetzt vom Update.
+3. Bei größeren Änderungen zusätzlich in einem echten Projekt testen: `npm pack`, dort `npm i -D ../lint-config/lifeofqui-lint-config-<version>.tgz`, dann `npm run lint:check` und `npm run build`.
+4. Nach dem Merge lokal auf `main`: `npm version patch|minor|major` und `git push --follow-tags`. Der Tag startet `.github/workflows/publish.yml`. Der Workflow lässt `npm test` laufen und legt die Version dann per npm Trusted Publishing als Staged Publish ab.
+5. Freigeben: auf npmjs.com im Tab „Staged Packages“ auf Approve klicken, oder `npm stage approve <stage-id>` (beides mit 2FA). Erst dann ist die Version live.
+6. In den Projekten öffnet Dependabot einen PR, die CI prüft ihn mit `npm run lint:check`.
 
 Einmalig auf npmjs.com einrichten: Paket → Settings → Trusted Publisher → GitHub Actions mit Owner `LifeOfQui`, Repository `lint-config` und Workflow `publish.yml`. „Allow npm publish“ bleibt aus, damit jede Version die Freigabe mit 2FA braucht.
 
 Semver: neue oder verschärfte Regeln und Tool-Updates mit Formatierungsänderungen → `minor`, Lockerungen und Fixes → `patch`, geänderte Datei-Struktur oder Optionen → `major`.
+
+## Barrierefreiheit
+
+`eslint-plugin-vuejs-accessibility` läuft mit einer kuratierten Auswahl über `app/**/*.vue`. Die Auswahl wurde gegen alle Projekte geprüft. Regeln, die dort fast nur Fehlalarme liefern, sind nicht dabei (Begründung als Kommentar in `eslint.js`). Die meisten Treffer kommen von `label-has-for` und `form-control-has-label`: ein `<label>` ohne `for` neben einem `<input>` ohne `id`. Fix: das Input ins Label schachteln oder `for`/`id` setzen.
+
+Bestehende Treffer in einem Projekt lassen sich bei der Umstellung per Bulk Suppression einfrieren, neuer Code muss die Regeln dann einhalten:
+
+```bash
+npx eslint . --suppress-rule vuejs-accessibility/label-has-for --suppress-rule vuejs-accessibility/form-control-has-label
+```
 
 ## Stolperfalle: Inline-Handler mit mehreren Anweisungen
 

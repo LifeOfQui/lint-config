@@ -46,5 +46,7 @@ printf 'export enum Color {\n  Red,\n}\n' > app/utils/color.ts
 expect_rule no-restricted-syntax node_modules/.bin/eslint app/utils/color.ts
 printf "export function fail() {\n  throw Error('fail')\n}\n" > app/utils/fail.ts
 expect_rule throw-new-error node_modules/.bin/oxlint app/utils/fail.ts
+printf '<template>\n  <img src="/logo.png" />\n</template>\n' > app/components/Logo.vue
+expect_rule vuejs-accessibility/alt-text node_modules/.bin/eslint app/components/Logo.vue
 
 echo "Smoke test passed"
