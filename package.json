@@ -36,13 +36,13 @@
   },
   "dependencies": {
     "@vue/eslint-config-typescript": "14.9.0",
-    "eslint": "10.14.0",
+    "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-oxlint": "1.93.0",
+    "eslint-plugin-oxlint": "1.94.0",
     "eslint-plugin-vue": "10.12.1",
     "eslint-plugin-vuejs-accessibility": "2.6.3",
-    "oxfmt": "0.78.0",
-    "oxlint": "1.93.0"
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0"
   },
   "engines": {
     "node": ">=22.18"
